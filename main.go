@@ -20,6 +20,8 @@ type syncGroup struct {
 // Make sure we don't get bogged down in channel syncronization
 const CHAN_SIZE = 100
 
+// Read all urls from the url channel and dispatch their processing to goroutines,
+// using the syncro.buffer as a "goroutine pool".
 func dispatch(syncro syncGroup) {
 	defer syncro.waitGroup.Done()
 
@@ -38,7 +40,7 @@ func dispatch(syncro syncGroup) {
 	close(syncro.done)
 }
 
-// Run the program logic.
+// Launch the goroutines and watch for errors.
 func run(inPath, outPath string, size uint64) error {
 	syncro := syncGroup{
 		buffer:    make(chan struct{}, size),
