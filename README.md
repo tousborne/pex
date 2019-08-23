@@ -1,11 +1,13 @@
 Pex challenge.
 
 ### Ideas
-My assumption is that memory is the limiting factor in this situation and therefore I approached the situation with the goal of maximizing a certian amount of memory usage.  To acheive that, I specify a buffer size that limits the number of images that are held in memory and being processed.
+My assumption is that memory is the limiting factor in this situation and therefore I approached the situation with the goal of maximizing a certian amount of memory usage.  To acheive that, I specify a buffer size that limits the number of images that are held in memory and being processed.  It would have been better to implement memory and goroutine pools, but I think that's a little outside the scope of this challenge, so instead I played with channels.
 
 Possible optimizations include:
-* Break the image processing up into a divide and conquer then sort the results approach
+* Break the processing of individual images up into a divide and conquer approach
 * Breaking up the downloading and processing into seperate goroutines
+* Maintaining the in-use amount of memory and optimizing the number of downloading and processing goroutines to always have a full "pipeline"
+* Need to run an profiler to see if there are any obvious things I'm missing
 
 ### Usage
 ```
