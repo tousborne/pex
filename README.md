@@ -10,7 +10,8 @@ downloading and processing routines whose parameters could be independently tune
 ideal.  However, the CPU is such a bottleneck that having a single tunable parameter of the number
 of images to concurrently process did not result in any noticable performance changes as the
 network and memory usage were insignificant compared to CPU usage.  If 1-2 orders of magnitude more
-CPUs were thrown at the problem, then the above optimization would begin to make sense.
+CPUs were thrown at the problem relative to the available memory and network resources, then the
+above optimization would begin to make sense.
 
 Possible optimizations include:
 * Parsing an evenly divided subset of every image (such as every 10th pixel), then running a
