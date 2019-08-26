@@ -86,7 +86,7 @@ func main() {
 	flag.Parse()
 
 	if (inPath == "") || (outPath == "") {
-		fmt.Fprintf(os.Stderr, "Both --in and --out flags are required")
+		fmt.Fprintln(os.Stderr, "Both --in and --out flags are required")
 		os.Exit(-1)
 	}
 
