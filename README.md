@@ -2,13 +2,13 @@ Pex challenge.
 
 ### Ideas
 The idea behind the program is to be able to tune the number of downloading and executing
-goroutines in order to maximize the thoroughput on a given set of hardware.  The
+goroutines in order to maximize the throughput on a given set of hardware.  The
 downloading threads push their downloaded image data to a buffer that the parsing threads
-can pull from.  The downloading threads also form an ad-hoc buffer as they will hold the
-image data in memory if the buffer pipeline is full. Anecdotally, using the provided
-limits of 512M and 1 CPU in a cgroup yielded performace results that indicated the CPU was
-a severe bottleneck, but I have a pretty good internet connection and my test data may not
-have been representative of the real world.
+can pull from.  The downloading threads can also form an ad-hoc buffer as they will hold
+the image data in memory if the buffer pipeline is full. Anecdotally, using the provided
+limits of 512M and 1 CPU in a CGroup yielded performance results that indicated the CPU
+was a severe bottleneck, but I have a pretty good internet connection and my test data may
+not have been representative of the real world.
 
 Possible optimizations include:
 * Parsing an evenly divided subset of every image (such as every 10th pixel), then running
@@ -29,8 +29,8 @@ cpu usage.  Be careful though, as high numbers can easily eat through the system
 resources.
 
 Note: I tended to find that using around double the number of downloading threads to
-execution threads maximized thoroughput, with 300 downloading threads and 150 executing
-threads being the performace sweet spot on my modern laptop.
+execution threads maximized throughput, with 300 downloading goroutines and 150 executing
+goroutines being the performance sweet spot on my modern laptop.
 
 
 ### Notes
