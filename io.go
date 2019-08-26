@@ -2,24 +2,31 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/csv"
 	"fmt"
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"sync"
 )
 
-// Download an image image from the given url and process it, then send it to the csv
+type imageBuffer struct {
+	url   string
+	bytes []byte
+}
+
+// Download an image from the given url and push the image data and url to the buffer
 // channel.
-func processImage(syncro syncGroup, dispatch *sync.WaitGroup, url string) {
+func downloadImage(syncro syncGroup, dispatch *sync.WaitGroup, url string) {
 	defer dispatch.Done()
 
-	// Remove the "block" from the buffer to allow more images to be processed.
+	// Remove the "block from the download slots to all more downloaders to run.
 	defer func() {
-		<-syncro.buffer
+		<-syncro.downSlots
 	}()
 
 	response, err := http.Get(url)
@@ -28,14 +35,36 @@ func processImage(syncro syncGroup, dispatch *sync.WaitGroup, url string) {
 		return
 	}
 
-	image, _, err := image.Decode(response.Body)
+	buffer := imageBuffer{
+		url: url,
+	}
+
+	buffer.bytes, err = ioutil.ReadAll(response.Body)
+	if err != nil {
+		syncro.err <- fmt.Errorf("Error downloading image: %s", err)
+		return
+	}
+
+	syncro.buffer <- buffer
+}
+
+// Process the given image data and push the processed csv data to the csvs channel.
+func processImage(syncro syncGroup, dispatch *sync.WaitGroup, data imageBuffer) {
+	defer dispatch.Done()
+
+	// Remove the "block" from the buffer to allow more images to be processed.
+	defer func() {
+		<-syncro.execSlots
+	}()
+
+	image, _, err := image.Decode(bytes.NewReader(data.bytes))
 	if err != nil {
 		syncro.err <- err
 		return
 	}
 
 	r, g, b := parseImage(image)
-	syncro.csvs <- []string{url, r, g, b}
+	syncro.csvs <- []string{data.url, r, g, b}
 }
 
 // Read the given input file and stream the urls to the url channel.
