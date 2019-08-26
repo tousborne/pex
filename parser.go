@@ -1,19 +1,20 @@
 package main
 
 import (
-	"fmt"
+	//"fmt"
 	"image"
 	"image/color"
 	_ "image/jpeg"
 	_ "image/png"
+	"strconv"
 )
 
 // Parse the given image data and return the three most common colored pixels in the
 // form of "#RRGGBB" with hex digits corresponding to red, green, and blue.
 func parseImage(data image.Image) (string, string, string) {
-	histogram := make(map[string]uint64)
+	histogram := make(map[uint32]uint64)
 	var first, second, third uint64
-	var firstRGB, secondRGB, thirdRGB string
+	var firstRGB, secondRGB, thirdRGB uint32
 
 	// Recommended by the image library to loop on y then x for best performance.
 	bounds := data.Bounds()
@@ -36,8 +37,8 @@ func parseImage(data image.Image) (string, string, string) {
 				b = temp.B
 			}
 
-			// Convert the color to hex representation
-			hex := fmt.Sprintf("#%02X%02X%02X", r, g, b)
+			// Convert the color to RGB "hex" representation
+			hex := (uint32(r) << 16) | (uint32(g) << 8) | uint32(b)
 
 			count := histogram[hex] + 1
 			histogram[hex] = count
@@ -82,13 +83,18 @@ func parseImage(data image.Image) (string, string, string) {
 	}
 
 	// If there aren't three colors, fill in with the other leaders.
-	if secondRGB == "" {
+	if second == 0 {
 		secondRGB = firstRGB
 	}
 
-	if thirdRGB == "" {
+	if third == 0 {
 		thirdRGB = secondRGB
 	}
 
-	return firstRGB, secondRGB, thirdRGB
+	// Convert the colors to actual RGB hex strings
+	firstRGBstr := "#" + strconv.FormatUint(uint64(firstRGB), 16)
+	secondRGBstr := "#" + strconv.FormatUint(uint64(secondRGB), 16)
+	thirdRGBstr := "#" + strconv.FormatUint(uint64(thirdRGB), 16)
+
+	return firstRGBstr, secondRGBstr, thirdRGBstr
 }

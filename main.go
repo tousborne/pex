@@ -7,6 +7,13 @@ import (
 	"sync"
 )
 
+// XXX: profiling
+//import (
+//	"log"
+//	"net/http"
+//	_ "net/http/pprof"
+//)
+
 // Synchronization data to be passed around routines.
 type syncGroup struct {
 	buffer    chan struct{}
@@ -16,9 +23,6 @@ type syncGroup struct {
 	urls      chan string
 	waitGroup *sync.WaitGroup
 }
-
-// Make sure we don't get bogged down in channel syncronization
-const CHAN_SIZE = 100
 
 // Read all urls from the url channel and dispatch their processing to goroutines,
 // using the syncro.buffer as a "goroutine pool".
@@ -46,8 +50,8 @@ func run(inPath, outPath string, size uint64) error {
 		buffer:    make(chan struct{}, size),
 		done:      make(chan struct{}),
 		err:       make(chan error),
-		urls:      make(chan string, CHAN_SIZE),
-		csvs:      make(chan []string, CHAN_SIZE),
+		urls:      make(chan string, size),
+		csvs:      make(chan []string, size),
 		waitGroup: new(sync.WaitGroup),
 	}
 
@@ -85,6 +89,11 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Both --in and --out flags are required")
 		os.Exit(-1)
 	}
+
+	// XXX: Profiling
+	//go func() {
+	//	log.Println(http.ListenAndServe("localhost:6060", nil))
+	//}()
 
 	err := run(inPath, outPath, size)
 	if err != nil {
