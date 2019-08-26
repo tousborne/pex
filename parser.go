@@ -1,12 +1,11 @@
 package main
 
 import (
-	//"fmt"
+	"fmt"
 	"image"
 	"image/color"
 	_ "image/jpeg"
 	_ "image/png"
-	"strconv"
 )
 
 // Parse the given image data and return the three most common colored pixels in the
@@ -92,9 +91,9 @@ func parseImage(data image.Image) (string, string, string) {
 	}
 
 	// Convert the colors to actual RGB hex strings
-	firstRGBstr := "#" + strconv.FormatUint(uint64(firstRGB), 16)
-	secondRGBstr := "#" + strconv.FormatUint(uint64(secondRGB), 16)
-	thirdRGBstr := "#" + strconv.FormatUint(uint64(thirdRGB), 16)
+	firstRGBstr := fmt.Sprintf("#%06X", firstRGB)
+	secondRGBstr := fmt.Sprintf("#%06X", secondRGB)
+	thirdRGBstr := fmt.Sprintf("#%06X", thirdRGB)
 
 	return firstRGBstr, secondRGBstr, thirdRGBstr
 }
